@@ -6,7 +6,7 @@ on:
       - "*"
 
 env:
-  PLUGIN_NAME: obsidian-tikzjax # Change this to match the id of your plugin.
+  PLUGIN_NAME: ye-tikz # Matches manifest id.
 
 jobs:
   build:
