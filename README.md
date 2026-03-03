@@ -1,6 +1,6 @@
 <img width=275 align="right" src="./imgs/screenshot.png">
 
-# Obsidian TikZJax
+# YeTikz
 
 A plugin for Obsidian that lets you render LaTeX and TikZ diagrams in your notes.
 
@@ -9,6 +9,7 @@ You can render graphs, figures, circuits, chemical diagrams, commutative diagram
 The following packages are available in `\usepackage{}`:
 - chemfig
 - tikz-cd
+- **quiver** (auto-replaced by tikz-cd + amssymb; [q.uiver.app](https://q.uiver.app) exports work; curve/between are no-ops in TikZJax)
 - circuitikz
 - pgfplots
 - array
@@ -19,11 +20,13 @@ The following packages are available in `\usepackage{}`:
 - tikz-3dplot
 
 ## Usage
-Content inside of `tikz` code blocks will be rendered by TikZJax.
+Content inside of `tikz` code blocks will be rendered by YeTikz.
 
 - Remember to load any packages you need with `\usepackage{}`, and include `\begin{document}` and `\end{document}`.
 
 - The standalone document class is used (`\documentclass{standalone}`).
+
+- **Quiver:** Use `\usepackage{quiver}` as in [q.uiver.app](https://q.uiver.app) exports; the plugin replaces it with `tikz-cd` + `amssymb` and no-op styles so TikZJax can render. Fancy options (curve, between) are ignored; basic commutative diagrams render correctly.
 
 
 ### Examples
@@ -126,6 +129,22 @@ C' \arrow[rr,"k'" near end] \arrow[dr,swap,"c"] && D' \arrow[dr,swap,"d"] \\
 ```
 ````
 
+### Quiver (q.uiver.app) diagrams
+
+You can paste LaTeX exported from [q.uiver.app](https://q.uiver.app) and use `\usepackage{quiver}` as usual. The plugin replaces it with `tikz-cd` + `amssymb` so diagrams render (curve/between etc. are no-ops).
+
+````latex
+```tikz
+\usepackage{quiver}
+\begin{document}
+\begin{tikzcd}
+  A \arrow[r, "f"] \arrow[d, "g"'] & B \arrow[d, "h"] \\
+  C \arrow[r, "k"']                & D
+\end{tikzcd}
+\end{document}
+```
+````
+
 <img width=325 align="right" src="./imgs/img5.png">
 
 ````latex
@@ -170,7 +189,7 @@ C' \arrow[rr,"k'" near end] \arrow[dr,swap,"c"] && D' \arrow[dr,swap,"d"] \\
 ````
 
 ## Contributing
-Contributions are welcome! For information on building Tikzjax, have a look at the [contributing guide](https://github.com/artisticat1/obsidian-tikzjax/issues/68), courtesy of [@thecodechemist99](https://github.com/thecodechemist99).
+Contributions are welcome! For information on building YeTikz, have a look at the [contributing guide](https://github.com/artisticat1/obsidian-tikzjax/issues/68), courtesy of [@thecodechemist99](https://github.com/thecodechemist99).
 
 ## Acknowledgements
 This plugin would not be possible without [TikZJax](https://github.com/kisonecat/tikzjax) by [@kisonecat](https://github.com/kisonecat)! In particular, it uses

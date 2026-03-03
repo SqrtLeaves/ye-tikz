@@ -5,6 +5,17 @@ import { optimize } from "./svgo.browser";
 // @ts-ignore
 import tikzjaxJs from 'inline:./tikzjax.js';
 
+/** Replacement for \\usepackage{quiver}. TikZJax does not support \\usetikzlibrary{calc} or the full curve style, so we only inject tikz-cd + amssymb and no-op curve/between so exported code does not error. */
+const QUIVER_REPLACEMENT = `\\usepackage{tikz-cd}
+\\usepackage{amssymb}
+% TikZJax-safe: no \\usetikzlibrary; curve/between as no-ops so quiver code runs
+\\tikzset{curve/.style={}}
+\\tikzset{between/.style n args={2}{}}
+\\tikzset{tail reversed/.style={}}
+\\tikzset{2tail/.style={}}
+\\tikzset{2tail reversed/.style={}}
+\\tikzset{no body/.style={}}`;
+
 
 export default class TikzjaxPlugin extends Plugin {
 	settings: TikzjaxPluginSettings;
@@ -13,13 +24,8 @@ export default class TikzjaxPlugin extends Plugin {
 		await this.loadSettings();
 		this.addSettingTab(new TikzjaxSettingTab(this.app, this));
 
-		// Support pop-out windows
-		this.app.workspace.onLayoutReady(() => {
-			this.loadTikZJaxAllWindows();
-			this.registerEvent(this.app.workspace.on("window-open", (win, window) => {
-				this.loadTikZJax(window.document);
-			}));
-		});
+		// TikZJax is loaded lazily per-document when the first tikz block is rendered,
+		// so it sees the script tags and can process them (fixes "无法显示图片").
 
 
 		this.addSyntaxHighlighting();
@@ -42,20 +48,18 @@ export default class TikzjaxPlugin extends Plugin {
 
 
 	loadTikZJax(doc: Document) {
-		const s = document.createElement("script");
+		if (doc.getElementById("tikzjax")) return;
+		const s = doc.createElement("script");
 		s.id = "tikzjax";
 		s.type = "text/javascript";
 		s.innerText = tikzjaxJs;
 		doc.body.appendChild(s);
-
-
 		doc.addEventListener('tikzjax-load-finished', this.postProcessSvg);
 	}
 
 	unloadTikZJax(doc: Document) {
 		const s = doc.getElementById("tikzjax");
-		s.remove();
-
+		if (s) s.remove();
 		doc.removeEventListener("tikzjax-load-finished", this.postProcessSvg);
 	}
 
@@ -94,12 +98,16 @@ export default class TikzjaxPlugin extends Plugin {
 
 	registerTikzCodeBlock() {
 		this.registerMarkdownCodeBlockProcessor("tikz", (source, el, ctx) => {
+			// Ensure container has class for SVG styling (display, centering)
+			el.addClass("block-language-tikz");
 			const script = el.createEl("script");
-
 			script.setAttribute("type", "text/tikz");
 			script.setAttribute("data-show-console", "true");
-
 			script.setText(this.tidyTikzSource(source));
+			// Load TikZJax in this document when first tikz block is rendered, so it
+			// sees our script tags and replaces them with SVG (fixes diagrams not showing).
+			const doc = el.ownerDocument;
+			this.loadTikZJax(doc);
 		});
 	}
 
@@ -120,6 +128,8 @@ export default class TikzjaxPlugin extends Plugin {
 		const remove = "&nbsp;";
 		tikzSource = tikzSource.replaceAll(remove, "");
 
+		// Replace \usepackage{quiver} with TikZJax-safe tikz-cd + amssymb + no-op styles
+		tikzSource = tikzSource.replace(/\\usepackage(\[[^\]]*\])?\{quiver\}/g, QUIVER_REPLACEMENT);
 
 		let lines = tikzSource.split("\n");
 

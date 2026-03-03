@@ -20,10 +20,10 @@ export class TikzjaxSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 
 
-		// Configure localForage if it hasn't been configured by TikZJax already
+		// Configure localForage if it hasn't been configured by YeTikz already
 		// The try-catch block fixes the plugin failing to load on mobile
 		try {
-			localForage.config({ name: 'TikzJax', storeName: 'svgImages' });
+			localForage.config({ name: 'YeTikz', storeName: 'svgImages' });
 		} catch (error) {
 			console.log(error);
 		}
@@ -44,10 +44,9 @@ export class TikzjaxSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 
-
 		new Setting(containerEl)
 			.setName('Clear cached SVGs')
-			.setDesc('SVGs rendered with TikZJax are stored in a database, so diagrams don\'t have to be re-rendered from scratch every time you open a page. Use this to clear the cache and force all diagrams to be re-rendered.')
+			.setDesc('SVGs rendered with YeTikz are stored in a database, so diagrams don\'t have to be re-rendered from scratch every time you open a page. Use this to clear the cache and force all diagrams to be re-rendered.')
 			.addButton(button => button
 				.setIcon("trash")
 				.setTooltip("Clear cached SVGs")
@@ -58,7 +57,7 @@ export class TikzjaxSettingTab extends PluginSettingTab {
 							new Notice(err, 3000);
 						}
 						else {
-							new Notice("TikZJax: Successfully cleared cached SVGs.", 3000);
+							new Notice("YeTikz: Successfully cleared cached SVGs.", 3000);
 						}
 					});
 				}));

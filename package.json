@@ -1,5 +1,5 @@
 {
-	"name": "obsidian-tikzjax",
+	"name": "ye-tikz",
 	"version": "0.5.2",
 	"description": "Render LaTeX and TikZ diagrams in your notes",
 	"main": "main.js",
