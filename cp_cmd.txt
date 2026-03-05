@@ -1,0 +1,5 @@
+cp manifest.json /Users/leaves/同步空间/Obsidian/MATH/.obsidian/plugins/ye-tikz;
+
+cp main.ts /Users/leaves/同步空间/Obsidian/MATH/.obsidian/plugins/ye-tikz;
+
+cp styles.css /Users/leaves/同步空间/Obsidian/MATH/.obsidian/plugins/ye-tikz;
